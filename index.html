@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a6f78">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pool Test">
+<meta name="description" content="Step-by-step guide for Taylor professional pool test kits, with a water-chemistry log.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!--APP-HEAD-START-->
+<title>Pool Test Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one thumb-reach column, sticky step header, fixed bottom action bar. Reagent colors (DPD pink, phenol red, TA green/red, CH wine/blue) are the only decoration. */
+:root{
+  --bg:#eef3f4; --surface:#ffffff; --sunk:#e3eaec; --ink:#0f1e23; --muted:#52646b; --line:#cfdadd;
+  --accent:#0a6f78; --accent-ink:#ffffff; --accent-soft:#d4ecee;
+  --ok:#17703f; --ok-bg:#dcf1e4; --warn:#9a5200; --warn-bg:#fbead2; --bad:#b0261d; --bad-bg:#f8dcd9;
+  --font-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#091315; --surface:#11201f; --sunk:#0d1a1b; --ink:#e6f0f1; --muted:#93a8ad; --line:#22383a;
+  --accent:#3bb8c2; --accent-ink:#04191b; --accent-soft:#123638;
+  --ok:#5fd093; --ok-bg:#12301f; --warn:#f0b257; --warn-bg:#352611; --bad:#ff8a80; --bad-bg:#3a1714;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#091315; --surface:#11201f; --sunk:#0d1a1b; --ink:#e6f0f1; --muted:#93a8ad; --line:#22383a;
+  --accent:#3bb8c2; --accent-ink:#04191b; --accent-soft:#123638;
+  --ok:#5fd093; --ok-bg:#12301f; --warn:#f0b257; --warn-bg:#352611; --bad:#ff8a80; --bad-bg:#3a1714;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--font-body);-webkit-text-size-adjust:100%;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding-block:8px 132px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.1}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px;display:flex;align-items:center;gap:10px}
+.top h1{font-size:22px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;height:40px;min-width:40px;padding:0 14px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.btn{border:0;border-radius:12px;min-height:56px;padding:0 18px;font-weight:700;font-size:17px;background:var(--sunk);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.danger{background:var(--bad-bg);color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.block{width:100%}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dock .in{max-width:560px;margin:0 auto;display:flex;gap:10px}
+.dock .in .btn{flex:1}
+.dock .in .btn.back{flex:0 0 auto;min-width:84px}
+/* progress */
+.prog{height:6px;border-radius:6px;background:var(--sunk);overflow:hidden}
+.prog>i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.stepmeta{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px}
+.step h2{font-size:32px;font-weight:700;margin-block:6px 10px}
+.step .body{font-size:18px;line-height:1.5}
+.step .body p{margin:0 0 10px}
+.step .body b{font-weight:700}
+/* reagent chip */
+.reagents{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.reagent{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.reagent .amt{font-family:var(--font-display);font-size:28px;font-weight:700;min-width:64px;text-align:center;line-height:1;font-variant-numeric:tabular-nums}
+.reagent .amt small{display:block;font-family:var(--font-body);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.reagent .code{font-weight:700;font-size:17px}
+.reagent .nm{font-size:14px;color:var(--muted)}
+.tip{border-radius:12px;padding:12px 14px;background:var(--accent-soft);font-size:15px;margin-top:14px}
+.tip b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.tip.warn{background:var(--warn-bg)}
+/* choices */
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.choice{display:flex;align-items:center;gap:14px;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;min-height:64px;font-size:17px;font-weight:600}
+.choice.sel{border-color:var(--accent);background:var(--accent-soft)}
+.choice .sw{flex:0 0 auto}
+/* swatch */
+.sw{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.18);display:inline-block}
+.sw.clear{background:repeating-linear-gradient(45deg,#ffffff 0 5px,#e9eef0 5px 10px)}
+.flow{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:600}
+.flow .arrow{color:var(--muted)}
+/* counter */
+.counter{margin-top:16px;display:grid;grid-template-columns:1fr;gap:12px}
+.tally{display:flex;align-items:baseline;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tally .n{font-family:var(--font-display);font-size:64px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.tally .n small{font-size:18px;font-weight:600;color:var(--muted);margin-left:6px}
+.tally .v{text-align:right}
+.tally .v .big{font-family:var(--font-display);font-size:34px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
+.drop{height:132px;border-radius:20px;border:0;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:34px;font-weight:700;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .06s}
+.drop:active{transform:scale(.98)}
+.drop small{display:block;font-family:var(--font-body);font-size:14px;font-weight:600;opacity:.85}
+.minor{display:flex;gap:10px}
+.minor .btn{flex:1;min-height:48px;font-size:15px}
+/* comparator picker */
+.picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:16px}
+.pick{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:var(--font-display);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;min-height:76px;justify-content:center}
+.pick .sw{width:28px;height:28px}
+.pick.half{font-size:18px;min-height:52px;border-style:dashed;color:var(--muted)}
+.pick.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.pick.wide{grid-column:span 2;font-size:17px}
+.subhead{margin-top:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:14px}
+.input{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px;min-height:48px;width:100%;font-size:17px}
+textarea.input{min-height:84px;resize:vertical}
+.input.num{font-family:var(--font-display);font-size:26px;font-weight:700}
+.toggles{display:flex;flex-wrap:wrap;gap:8px}
+.tog{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px;font-weight:600;font-size:15px;display:inline-flex;gap:8px;align-items:center}
+.tog.on{border-color:var(--accent);background:var(--accent-soft)}
+.tog.locked{opacity:.75;cursor:default}
+.tog .chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);display:inline-grid;place-items:center;font-size:12px;line-height:1}
+.tog.on .chk{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+/* results */
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.res{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.res .k{font-size:13px;font-weight:600;color:var(--muted)}
+.res .v{font-family:var(--font-display);font-size:34px;font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums}
+.res .v small{font-size:15px;font-weight:600;color:var(--muted);margin-left:4px}
+.res .st{align-self:flex-start;margin-top:4px}
+.res.full{grid-column:1/-1}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;letter-spacing:.02em}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.na{background:var(--sunk);color:var(--muted)}
+/* history */
+.hist{display:flex;flex-direction:column;gap:10px}
+.hitem{display:flex;flex-direction:column;gap:8px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.hitem .h{display:flex;justify-content:space-between;gap:8px;font-weight:700}
+.hitem .h span:last-child{font-weight:500;color:var(--muted);font-size:14px;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;font-weight:600;border-radius:8px;padding:3px 8px;background:var(--sunk);font-variant-numeric:tabular-nums}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.example{opacity:.7;border-style:dashed}
+.kitpick{display:grid;gap:10px}
+.kitopt{text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.kitopt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.kitopt strong{font-family:var(--font-display);font-size:22px}
+.hero{padding:18px;border-radius:18px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.hero h2{font-size:30px}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+.ranges{display:grid;grid-template-columns:1fr 80px 80px;gap:8px;align-items:center}
+.ranges .input{padding:8px;min-height:40px;text-align:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;z-index:20;font-size:15px;max-width:calc(100% - 32px)}
+.confirm{border:2px solid var(--bad);background:var(--bad-bg);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.copybox{width:100%;min-height:160px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media (min-width:480px){.picker{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+<!--APP-HEAD-END-->
+</head>
+<body>
+<!--APP-BODY-START-->
+<div class="wrap" id="app"></div>
+<div class="dock" id="dock" hidden><div class="in" id="dockIn"></div></div>
+<div class="toast" id="toast" hidden></div>
+<script>
+(function(){
+'use strict';
+
+/* ---------- storage ---------- */
+var KEY='taylorPoolGuide.v1';
+var DEF={
+  settings:{kit:null,fasSample:25,initials:'',facility:'',pools:['Main pool'],
+    ranges:{fc:[2,4],cc:[0,0.4],ph:[7.2,7.8],ta:[80,120],ch:[200,400],cya:[30,90],lsi:[-0.3,0.3]},
+    lastTests:{ta:false,ch:false,cya:false,temp:true,demand:false},lastPool:'Main pool'},
+  history:[],current:null
+};
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function load(){
+  var d=clone(DEF);
+  try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);
+    d.settings=Object.assign(d.settings,p.settings||{});
+    d.settings.ranges=Object.assign(clone(DEF.settings.ranges),(p.settings||{}).ranges||{});
+    d.settings.lastTests=Object.assign(clone(DEF.settings.lastTests),(p.settings||{}).lastTests||{});
+    d.history=Array.isArray(p.history)?p.history:[];d.current=p.current||null;}}catch(e){}
+  return d;
+}
+var db=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+
+/* ---------- helpers ---------- */
+var app=document.getElementById('app'),dock=document.getElementById('dock'),dockIn=document.getElementById('dockIn');
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function fmt(n,d){if(n==null||isNaN(n))return '—';return Number(n).toFixed(d==null?1:d)}
+function round(n,d){var m=Math.pow(10,d);return Math.round(n*m)/m}
+var toastT;
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},2200)}
+function buzz(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}}
+var wake=null;
+function keepAwake(on){
+  try{
+    if(on&&!wake&&navigator.wakeLock){navigator.wakeLock.request('screen').then(function(w){wake=w;w.addEventListener('release',function(){wake=null})}).catch(function(){})}
+    if(!on&&wake){wake.release().catch(function(){});wake=null}
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&db.current)keepAwake(true)});
+function setDock(html){if(!html){dock.hidden=true;dockIn.innerHTML='';return}dock.hidden=false;dockIn.innerHTML=html}
+function copyText(text,okMsg,fallbackEl){
+  function fb(){if(fallbackEl){fallbackEl.hidden=false;fallbackEl.value=text;fallbackEl.focus();fallbackEl.select();toast('Select all and copy')}}
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast(okMsg||'Copied')},fb);return}}catch(e){}
+  fb();
+}
+
+/* ---------- colors (approximate; real match is against the comparator) ---------- */
+var DPD_PINK={0:'clear',0.5:'#f9dbe7',1:'#f4bfd5',1.5:'#efa4c4',2:'#e989b3',2.5:'#e3739f',3:'#dc5f95',4:'#d2468a',5:'#c4317b'};
+var PH_RED={6.8:'#f0c33b',7:'#efab3e',7.2:'#ec9145',7.4:'#e6764d',7.6:'#dd5c56',7.8:'#d0435f',8:'#bf2f6a',8.2:'#a72274'};
+function sw(c){return c==='clear'?'<span class="sw clear" aria-hidden="true"></span>':'<span class="sw" style="background:'+c+'" aria-hidden="true"></span>'}
+function nearestColor(map,v){var best=null,bd=1e9;Object.keys(map).forEach(function(k){var d=Math.abs(parseFloat(k)-v);if(d<bd){bd=d;best=map[k]}});return best}
+
+/* ---------- kits ---------- */
+var KITS={
+  K2006:{name:'K-2006',full:'Taylor K-2006 · FAS-DPD',how:'Chlorine by drop count: add powder, turn it pink, count drops until it goes clear.'},
+  K2005:{name:'K-2005',full:'Taylor K-2005 · DPD',how:'Chlorine by color match: add drops, compare the pink to the comparator block.'}
+};
+
+/* ---------- step definitions ---------- */
+function R(code,name,amt,unit){return{code:code,name:name,amt:amt,unit:unit}}
+function buildSteps(cur){
+  var t=cur.tests,s=[],k=cur.kit,f=cur.fasSample===10?0.5:0.2,mL=cur.fasSample===10?10:25,dip=cur.fasSample===10?1:2;
+  s.push({id:'collect',group:'Sample',type:'do',title:'Collect your water sample',
+    body:'<p>Take the sample <b>at elbow depth (about 18 in)</b>, away from return jets, skimmers and chemical feeders.</p><p>Hold the tube or bottle upside down, push it under, then turn it upright to fill. Rinse each test cell with pool water before you fill it.</p>',
+    tip:'Run the tests right away. Chlorine and pH drift if the sample sits in the sun.'});
+
+  /* chlorine */
+  if(k==='K2006'){
+    s.push({id:'fc-fill',group:'Chlorine',type:'do',title:'Fill the sample tube to '+mL+' mL',
+      body:'<p>Use the tall graduated sample tube. Fill to the <b>'+mL+' mL</b> line with pool water.</p>',
+      tip:mL===25?'25 mL gives 0.2 ppm per drop, the most precise setting. You can switch to 10 mL in Settings.':'10 mL gives 0.5 ppm per drop. Switch to 25 mL in Settings for more precision.'});
+    s.push({id:'fc-dpd',group:'Chlorine',type:'choice',key:'fcPink',title:'Add DPD powder and swirl',
+      reagents:[R('R-0870','DPD Powder',dip,dip===1?'dipper':'dippers')],
+      body:'<p>Add <b>'+dip+' level dipper'+(dip>1?'s':'')+'</b> of R-0870 powder. Swirl until it dissolves.</p><p>What color is it?</p>',
+      options:[{v:'yes',label:'Pink',swatch:'#e989b3',hint:'Free chlorine is present. Next you count drops.'},{v:'no',label:'Still clear',swatch:'clear',hint:'No free chlorine. Free chlorine = 0.'}]});
+    s.push({id:'fc-titrate',group:'Chlorine',type:'count',key:'fcDrops',factor:f,unit:'ppm',dec:1,min:1,label:'Free chlorine',
+      when:function(r){return r.fcPink==='yes'},
+      title:'Count drops until pink turns clear',reagents:[R('R-0871','FAS-DPD Titrating Reagent',1,'at a time')],
+      body:'<p>Add R-0871 <b>one drop at a time</b>. Swirl after each drop and tap the button. Stop when the sample turns <b>colorless</b>.</p>',
+      from:'#e989b3',to:'clear',
+      tip:'Hold the dropper bottle straight up and down so every drop is the same size.'});
+    s.push({id:'cc-r3',group:'Chlorine',type:'choice',key:'ccPink',title:'Add DPD Reagent #3 to the same sample',
+      reagents:[R('R-0003','DPD Reagent #3',5,'drops')],
+      body:'<p>Do not dump the sample. Add <b>5 drops</b> of R-0003 and swirl.</p><p>Did the pink come back?</p>',
+      options:[{v:'yes',label:'Pink came back',swatch:'#f4bfd5',hint:'Combined chlorine is present. Keep counting.'},{v:'no',label:'Stayed clear',swatch:'clear',hint:'Combined chlorine = 0.'}]});
+    s.push({id:'cc-titrate',group:'Chlorine',type:'count',key:'ccDrops',factor:f,unit:'ppm',dec:1,min:1,label:'Combined chlorine',
+      when:function(r){return r.ccPink==='yes'},
+      title:'Count new drops until clear again',reagents:[R('R-0871','FAS-DPD Titrating Reagent',1,'at a time')],
+      body:'<p>Keep adding R-0871 one drop at a time. Count <b>only the new drops</b>. Stop when the sample is colorless again.</p>',
+      from:'#f4bfd5',to:'clear'});
+  }else{
+    s.push({id:'fc-fill',group:'Chlorine',type:'do',title:'Fill the chlorine cell',
+      body:'<p>Rinse the <b>chlorine (DPD) side</b> of the comparator and fill it to the fill line with pool water.</p>'});
+    s.push({id:'fc-dpd',group:'Chlorine',type:'do',title:'Add DPD #1 and #2, then mix',
+      reagents:[R('R-0001','DPD Reagent #1',5,'drops'),R('R-0002','DPD Reagent #2',5,'drops')],
+      body:'<p>Add <b>5 drops R-0001</b> and <b>5 drops R-0002</b>. Cap and turn it over a few times to mix.</p>',
+      tip:'Read the color right away on the next screen. Free chlorine color keeps developing if you wait.'});
+    s.push({id:'fc-read',group:'Chlorine',type:'pick',key:'fcRead',label:'Free chlorine',unit:'ppm',map:DPD_PINK,
+      title:'Match the pink: free chlorine',body:'<p>Hold the comparator up to daylight or a white background. Tap the standard that matches best.</p>',
+      main:['0','0.5','1.0','1.5','2.0','3.0','5.0','>5.0'],halves:['2.5','4.0'],
+      tip:'If the pink flashes and then fades to clear or yellow, chlorine is too high and bleached the dye. Record ">5.0" and recheck with a diluted sample.',warn:true});
+    s.push({id:'tc-r3',group:'Chlorine',type:'do',title:'Add DPD Reagent #3',
+      reagents:[R('R-0003','DPD Reagent #3',5,'drops')],
+      body:'<p>Keep the same sample. Add <b>5 drops R-0003</b>. Cap and mix.</p>'});
+    s.push({id:'tc-read',group:'Chlorine',type:'pick',key:'tcRead',label:'Total chlorine',unit:'ppm',map:DPD_PINK,
+      title:'Match the pink again: total chlorine',body:'<p>Tap the standard that matches now. The app works out combined chlorine for you (total minus free).</p>',
+      main:['0','0.5','1.0','1.5','2.0','3.0','5.0','>5.0'],halves:['2.5','4.0']});
+  }
+  s.push({id:'cl-result',group:'Chlorine',type:'clresult',title:'Chlorine results'});
+
+  /* pH */
+  s.push({id:'ph-fill',group:'pH',type:'do',title:'Fill the pH cell',
+    body:'<p>Rinse the <b>pH side</b> of the comparator and fill it to the fill line with fresh pool water.</p>',
+    tip:'If free chlorine was over 10 ppm, add 1 drop of R-0007 before the pH indicator. High chlorine can turn the indicator purple and read falsely high.'});
+  s.push({id:'ph-r4',group:'pH',type:'do',title:'Add phenol red',
+    reagents:[R('R-0004','pH Indicator (phenol red)',5,'drops')],
+    body:'<p>Add <b>5 drops R-0004</b>. Cap and turn it over to mix.</p>'});
+  s.push({id:'ph-read',group:'pH',type:'pick',key:'phRead',label:'pH',unit:'',map:PH_RED,
+    title:'Match the color: pH',body:'<p>Compare against the pH standards. If it falls between two, tap the in-between value.</p>',
+    main:['6.8','7.0','7.2','7.4','7.6','7.8','8.0','8.2'],halves:['6.9','7.1','7.3','7.5','7.7','7.9','8.1'],halvesLabel:'Between two standards'});
+  s.push({id:'ph-demand',group:'pH',type:'count',key:'demandDrops',factor:1,unit:'drops',dec:0,min:0,label:'Demand',
+    when:function(r){if(!t.demand)return false;var p=parseFloat(r.phRead);var rg=db.settings.ranges.ph;return !isNaN(p)&&(p>rg[1]||p<rg[0])},
+    dyn:function(r){var hi=parseFloat(r.phRead)>db.settings.ranges.ph[1];return hi?
+      {title:'Acid demand',reagents:[R('R-0005','Acid Demand Reagent',1,'at a time')],body:'<p>Use the same pH sample. Add R-0005 one drop at a time, mixing and counting, until the color matches your target pH (usually 7.4–7.6).</p><p>Look the drop count up on your kit\'s <b>Acid Demand table</b> with the pool\'s volume to get the acid dose.</p>'}:
+      {title:'Base demand',reagents:[R('R-0006','Base Demand Reagent',1,'at a time')],body:'<p>Use the same pH sample. Add R-0006 one drop at a time, mixing and counting, until the color matches your target pH (usually 7.4–7.6).</p><p>Look the drop count up on your kit\'s <b>Base Demand table</b> with the pool\'s volume.</p>'}}});
+
+  if(t.ta){
+    s.push({id:'ta-fill',group:'Alkalinity',type:'do',title:'Fill the sample tube to 25 mL',body:'<p>Rinse the tall sample tube and fill to the <b>25 mL</b> line.</p>'});
+    s.push({id:'ta-7',group:'Alkalinity',type:'do',title:'Neutralize chlorine',reagents:[R('R-0007','Chlorine Neutralizer',2,'drops')],body:'<p>Add <b>2 drops R-0007</b>. Swirl.</p>'});
+    s.push({id:'ta-8',group:'Alkalinity',type:'do',title:'Add the alkalinity indicator',reagents:[R('R-0008','Total Alkalinity Indicator',5,'drops')],body:'<p>Add <b>5 drops R-0008</b>. Swirl. The sample turns <b>green</b>.</p>'});
+    s.push({id:'ta-9',group:'Alkalinity',type:'count',key:'taDrops',factor:10,unit:'ppm',dec:0,min:1,label:'Total alkalinity',
+      title:'Count drops until green turns red',reagents:[R('R-0009','Sulfuric Acid Reagent',1,'at a time')],
+      body:'<p>Add R-0009 one drop at a time. Swirl and tap after each drop. Stop when the color changes from <b>green to red</b>.</p>',from:'#3fa35f',to:'#d6453d',
+      tip:'Each drop = 10 ppm with a 25 mL sample.'});
+  }
+  if(t.ch){
+    s.push({id:'ch-fill',group:'Calcium',type:'do',title:'Fill the sample tube to 25 mL',body:'<p>Rinse the tall sample tube and fill to the <b>25 mL</b> line.</p>'});
+    s.push({id:'ch-10',group:'Calcium',type:'do',title:'Add the calcium buffer',reagents:[R('R-0010','Calcium Buffer',20,'drops')],body:'<p>Add <b>20 drops R-0010</b>. Swirl.</p>'});
+    s.push({id:'ch-11',group:'Calcium',type:'do',title:'Add the calcium indicator',reagents:[R('R-0011L','Calcium Hardness Indicator',5,'drops')],body:'<p>Add <b>5 drops R-0011L</b>. Swirl. The sample turns <b>red</b> if calcium is present.</p>'});
+    s.push({id:'ch-12',group:'Calcium',type:'count',key:'chDrops',factor:10,unit:'ppm',dec:0,min:1,label:'Calcium hardness',
+      title:'Count drops until red turns blue',reagents:[R('R-0012','Hardness Reagent',1,'at a time')],
+      body:'<p>Add R-0012 one drop at a time. Swirl and tap after each drop. Stop when it turns <b>blue</b> with no trace of red or purple.</p>',from:'#a92b5d',to:'#2f6fd0',
+      tip:'Each drop = 10 ppm with a 25 mL sample.'});
+  }
+  if(t.cya){
+    s.push({id:'cya-mix',group:'Stabilizer (CYA)',type:'do',title:'Fill the mixing bottle',reagents:[R('R-0013','Cyanuric Acid Reagent','to','upper mark')],
+      body:'<p>Fill the CYA mixing bottle to the <b>lower mark</b> with pool water. Then fill to the <b>upper mark</b> with R-0013.</p><p>Cap and shake for about 30 seconds. The water turns cloudy.</p>'});
+    s.push({id:'cya-pour',group:'Stabilizer (CYA)',type:'do',title:'Pour until the dot disappears',
+      body:'<p>Stand with your back to the sun. Look straight down into the empty CYA view tube at the <b>black dot</b> on the bottom.</p><p>Slowly pour the cloudy water in. Stop the moment the dot <b>completely disappears</b>.</p>'});
+    s.push({id:'cya-read',group:'Stabilizer (CYA)',type:'pick',key:'cyaRead',label:'Cyanuric acid',unit:'ppm',
+      title:'Read the tube: cyanuric acid',body:'<p>Read the number printed on the view tube at the liquid level.</p>',
+      main:['20','30','40','50','60','70','80','90','100'],extra:[{v:'<20',label:'Dot never disappeared'},{v:'>100',label:'Dot gone right away'}],
+      tip:'Over 100? Mix the sample half and half with tap water, retest and double the reading.'});
+  }
+  if(t.temp){
+    s.push({id:'temp',group:'Temperature',type:'number',key:'temp',title:'Water temperature',label:'Temperature (°F)',min:32,max:110,step:1,
+      body:'<p>Read the pool thermometer and enter the temperature. It\'s used for the saturation index.</p>'});
+  }
+  s.push({id:'summary',group:'Log',type:'summary',title:'Your log entry'});
+  return s.filter(function(x){return !x.when||x.when(cur.r)});
+}
+
+/* ---------- calculations ---------- */
+function num(v){if(v==null||v==='')return null;var n=parseFloat(String(v).replace(/[<>]/g,''));return isNaN(n)?null:n}
+function interp(table,x){
+  if(x<=table[0][0])return table[0][1];
+  for(var i=1;i<table.length;i++){if(x<=table[i][0]){var a=table[i-1],b=table[i];return a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0])}}
+  return table[table.length-1][1];
+}
+var TF=[[32,0],[37,.1],[46,.2],[53,.3],[60,.4],[66,.5],[76,.6],[84,.7],[94,.8],[105,.9]];
+function calc(cur){
+  var r=cur.r,o={};
+  if(cur.kit==='K2006'){
+    var f=cur.fasSample===10?0.5:0.2;
+    o.fc=r.fcPink==='no'?0:(r.fcPink==='yes'&&r.fcDrops?round(r.fcDrops*f,1):null);
+    o.cc=r.ccPink==='no'?0:(r.ccPink==='yes'&&r.ccDrops?round(r.ccDrops*f,1):null);
+    o.fcS=fmt(o.fc);o.ccS=fmt(o.cc);
+    o.tc=(o.fc!=null&&o.cc!=null)?round(o.fc+o.cc,1):null;o.tcS=fmt(o.tc);
+  }else{
+    o.fc=num(r.fcRead);o.tc=num(r.tcRead);
+    o.fcS=r.fcRead!=null?String(r.fcRead):'—';o.tcS=r.tcRead!=null?String(r.tcRead):'—';
+    var over=(String(r.fcRead||'')+String(r.tcRead||'')).indexOf('>')>=0;
+    o.cc=(o.fc!=null&&o.tc!=null&&!over)?round(Math.max(0,o.tc-o.fc),1):null;
+    o.ccS=over?'?':fmt(o.cc);
+  }
+  o.ph=num(r.phRead);o.phS=r.phRead||'—';
+  o.ta=r.taDrops?r.taDrops*10:null;
+  o.ch=r.chDrops?r.chDrops*10:null;
+  o.cya=num(r.cyaRead);o.cyaS=r.cyaRead||'—';if(r.cyaRead==='<20')o.cya=0;
+  o.temp=num(r.temp);
+  o.demand=(r.demandDrops!=null&&cur.tests.demand)?r.demandDrops:null;
+  if(o.ph!=null&&o.ta!=null&&o.ch!=null&&o.temp!=null&&o.ch>0){
+    var carb=Math.max(1,o.ta-(o.cya?o.cya/3:0));
+    o.lsi=round(o.ph+interp(TF,o.temp)+(Math.log10(o.ch)-0.4)+Math.log10(carb)-12.1,2);
+  }else o.lsi=null;
+  return o;
+}
+function status(key,v){
+  if(v==null)return null;var rg=db.settings.ranges[key];if(!rg)return null;
+  if(key==='fc'&&v<1)return 'bad';
+  if(key==='cc'&&v>rg[1])return v>=1?'bad':'warn';
+  if(key==='ph'&&(v<7||v>8))return 'bad';
+  return (v<rg[0]||v>rg[1])?'warn':'ok';
+}
+function pill(st,v,key){
+  if(!st)return '<span class="pill na">Not tested</span>';
+  var rg=db.settings.ranges[key],txt;
+  if(st==='ok')txt='In range';
+  else txt=v<rg[0]?'Low':'High';
+  if(key==='fc'&&v<1)txt='Below 1.0';
+  return '<span class="pill '+st+'">'+txt+'</span>';
+}
+
+/* ---------- views ---------- */
+var view='home',viewArg=null,confirmDel=false;
+function go(v,arg){view=v;viewArg=arg;confirmDel=false;render();window.scrollTo(0,0)}
+
+function render(){
+  if(view==='home')return renderHome();
+  if(view==='setup')return renderSetup();
+  if(view==='step')return renderStep();
+  if(view==='entry')return renderEntry();
+  if(view==='settings')return renderSettings();
+}
+
+function kitPickerHTML(sel){
+  return '<div class="kitpick">'+Object.keys(KITS).map(function(k){var K=KITS[k];
+    return '<button class="kitopt'+(sel===k?' sel':'')+'" data-kit="'+k+'" aria-pressed="'+(sel===k)+'"><strong>'+K.full+'</strong><span class="muted small">'+K.how+'</span></button>'}).join('')+'</div>';
+}
+
+function histItem(h,example){
+  var c=h.calc,chips=[];
+  function chip(label,val,key){var st=status(key,val);chips.push('<span class="chip'+(st==='warn'?' warn':st==='bad'?' bad':'')+'">'+label+' '+esc(val==null?'—':val)+'</span>')}
+  chip('FC',c.fc,'fc');chip('CC',c.cc,'cc');chip('pH',c.ph,'ph');
+  if(c.ta!=null)chip('TA',c.ta,'ta');if(c.ch!=null)chip('CH',c.ch,'ch');if(c.cya!=null)chip('CYA',c.cyaS,'cya');
+  var d=new Date(h.at);
+  return '<'+(example?'div':'button')+' class="hitem'+(example?' example':'')+'"'+(example?'':' data-open="'+esc(h.id)+'"')+'><div class="h"><span>'+(example?'Example · ':'')+esc(h.pool)+'</span><span>'+d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})+'</span></div><div class="chips">'+chips.join('')+'</div></'+(example?'div':'button')+'>';
+}
+
+function renderHome(){
+  keepAwake(false);
+  var S=db.settings,html='';
+  html+='<div class="top"><h1>Pool Test Guide</h1><button class="iconbtn" id="toSettings">Settings</button></div><div class="stack">';
+  if(!S.kit){
+    html+='<div class="hero"><span class="eyebrow">First time setup</span><h2>Which Taylor kit is in your case?</h2><p class="muted" style="margin:0">Check the label on the case lid. The steps change to match your kit. You can switch later in Settings.</p>'+kitPickerHTML(null)+'</div>';
+  }else{
+    if(db.current){
+      var cs=buildSteps(db.current),ci=Math.min(db.current.step,cs.length-1);
+      html+='<div class="hero"><span class="eyebrow">Test in progress</span><h2>'+esc(db.current.pool)+'</h2><p class="muted" style="margin:0">Stopped at step '+(ci+1)+' of '+cs.length+': '+esc(cs[ci].title)+'</p><div class="row"><button class="btn primary" id="resume" style="flex:1">Resume test</button><button class="btn ghost" id="discard">Discard</button></div></div>';
+    }else{
+      html+='<div class="hero"><span class="eyebrow">'+KITS[S.kit].full+'</span><h2>Ready to test the water</h2><p class="muted" style="margin:0">Step-by-step reagents, drop counts and comparator readings, then a finished log entry.</p><button class="btn primary block" id="start">Start a new test</button></div>';
+    }
+    html+='<div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Pool log</h3>'+(db.history.length?'<button class="iconbtn" id="exportCsv">Export CSV</button>':'')+'</div>';
+    if(db.history.length){
+      html+='<div class="hist">'+db.history.slice().reverse().map(function(h){return histItem(h)}).join('')+'</div>';
+      html+='<textarea class="input copybox" id="csvBox" hidden aria-label="CSV export"></textarea>';
+      html+='<p class="muted small" style="margin:0">Your log is saved on this phone only. Export it regularly to keep a copy.</p>';
+    }else{
+      html+='<p class="muted" style="margin:0">Saved tests show up here. Tap one to see the full readings or copy them into your facility log.</p>'+
+      histItem({pool:'Main pool',at:Date.now(),calc:{fc:2.8,cc:0.2,ph:7.4,ta:100,ch:280,cya:'40',cyaS:'40'}},true);
+    }
+  }
+  html+='</div>';
+  app.innerHTML=html;setDock(null);
+  app.querySelectorAll('[data-kit]').forEach(function(b){b.onclick=function(){db.settings.kit=b.dataset.kit;save();render()}});
+  var e;
+  if(e=document.getElementById('toSettings'))e.onclick=function(){go('settings')};
+  if(e=document.getElementById('start'))e.onclick=function(){go('setup')};
+  if(e=document.getElementById('resume'))e.onclick=function(){keepAwake(true);go('step')};
+  if(e=document.getElementById('discard'))e.onclick=function(){
+    if(confirmDel){db.current=null;save();confirmDel=false;toast('Test discarded');render();return}
+    confirmDel=true;e.textContent='Tap again to discard';e.classList.add('danger');
+  };
+  if(e=document.getElementById('exportCsv'))e.onclick=exportCSV;
+  app.querySelectorAll('[data-open]').forEach(function(b){b.onclick=function(){go('entry',b.dataset.open)}});
+}
+
+var TESTS=[['chlorine','Chlorine (free, combined, total)',true],['ph','pH',true],['ta','Total alkalinity',false],['ch','Calcium hardness',false],['cya','Cyanuric acid',false],['temp','Water temperature',false],['demand','Acid / base demand',false]];
+var setupState=null;
+function renderSetup(){
+  var S=db.settings;
+  if(!setupState)setupState={pool:S.lastPool&&S.pools.indexOf(S.lastPool)>=0?S.lastPool:S.pools[0],tests:clone(S.lastTests)};
+  var st=setupState;
+  var html='<div class="top"><button class="iconbtn" id="back">Back</button><h1>New test</h1></div><div class="stack">';
+  html+='<div class="field"><span class="eyebrow">Pool or spa</span><div class="toggles">'+S.pools.map(function(p){return '<button class="tog'+(st.pool===p?' on':'')+'" data-pool="'+esc(p)+'" aria-pressed="'+(st.pool===p)+'">'+esc(p)+'</button>'}).join('')+'</div></div>';
+  html+='<div class="field"><span class="eyebrow">Tests to run</span><div class="toggles">'+TESTS.map(function(t){var on=t[2]||st.tests[t[0]];
+    return '<button class="tog'+(on?' on':'')+(t[2]?' locked':'')+'" data-test="'+t[0]+'" aria-pressed="'+on+'"'+(t[2]?' aria-disabled="true"':'')+'><span class="chk">'+(on?'✓':'')+'</span>'+t[1]+'</button>'}).join('')+'</div>'+
+    '<span class="muted small">Daily logs usually need chlorine and pH. Add alkalinity, calcium and CYA for weekly tests. The saturation index needs pH, alkalinity, calcium and temperature.</span></div>';
+  html+='<div class="card small"><div class="dl"><dt>Kit</dt><dd>'+KITS[S.kit].full+'</dd>'+(S.kit==='K2006'?'<dt>Chlorine sample</dt><dd>'+S.fasSample+' mL ('+(S.fasSample===10?'0.5':'0.2')+' ppm per drop)</dd>':'')+'</div></div>';
+  html+='</div>';
+  app.innerHTML=html;
+  setDock('<button class="btn primary" id="go">Begin</button>');
+  document.getElementById('back').onclick=function(){setupState=null;go('home')};
+  app.querySelectorAll('[data-pool]').forEach(function(b){b.onclick=function(){st.pool=b.dataset.pool;renderSetup()}});
+  app.querySelectorAll('[data-test]').forEach(function(b){b.onclick=function(){var k=b.dataset.test;if(k==='chlorine'||k==='ph')return;st.tests[k]=!st.tests[k];renderSetup()}});
+  document.getElementById('go').onclick=function(){
+    S.lastTests=clone(st.tests);S.lastPool=st.pool;
+    db.current={id:'t'+Date.now(),startedAt:Date.now(),pool:st.pool,tests:clone(st.tests),kit:S.kit,fasSample:S.fasSample,step:0,r:{},extra:{drain:null,chems:'',notes:'',initials:S.initials}};
+    setupState=null;save();keepAwake(true);go('step');
+  };
+}
+
+function reagentHTML(list){
+  if(!list||!list.length)return '';
+  return '<div class="reagents">'+list.map(function(x){
+    var amt=x.amt==='to'?'<span style="font-size:18px">fill</span><small>'+x.unit+'</small>':(x.unit==='at a time'?'1<small>drop at a time</small>':x.amt+'<small>'+x.unit+'</small>');
+    if(x.unit==='at a time')amt='<span style="font-size:20px">1 by 1</span><small>drops</small>';
+    return '<div class="reagent"><div class="amt">'+amt+'</div><div><div class="code">'+x.code+'</div><div class="nm">'+x.name+'</div></div></div>'}).join('')+'</div>';
+}
+
+function renderStep(){
+  var cur=db.current;if(!cur){go('home');return}
+  var steps=buildSteps(cur);
+  if(cur.step>=steps.length)cur.step=steps.length-1;
+  var s=steps[cur.step],r=cur.r;
+  if(s.dyn)s=Object.assign({},s,s.dyn(r));
+  var pct=Math.round((cur.step)/(steps.length-1)*100);
+  var html='<div class="top"><button class="iconbtn" id="exit" aria-label="Save and exit">Exit</button><h1>'+esc(cur.pool)+'</h1></div>';
+  html+='<div class="step"><div class="stepmeta"><span class="eyebrow">'+esc(s.group)+'</span><span class="eyebrow">Step '+(cur.step+1)+' of '+steps.length+'</span></div><div class="prog"><i style="width:'+pct+'%"></i></div>';
+  if(s.type!=='summary'&&s.type!=='clresult')html+='<h2 style="margin-top:16px">'+esc(s.title)+'</h2>';
+  html+='<div class="body">'+(s.body||'')+'</div>'+reagentHTML(s.reagents);
+  var nextLabel='Done, next step',canNext=true;
+
+  if(s.type==='choice'){
+    html+='<div class="choices">'+s.options.map(function(o){return '<button class="choice'+(r[s.key]===o.v?' sel':'')+'" data-choice="'+o.v+'">'+sw(o.swatch)+'<span>'+o.label+'<br><span class="muted small" style="font-weight:500">'+o.hint+'</span></span></button>'}).join('')+'</div>';
+    canNext=!!r[s.key];nextLabel='Next';
+  }
+  if(s.type==='count'){
+    var n=r[s.key]||0,val=n*s.factor;
+    if(s.from)html+='<div class="flow">'+sw(s.from)+'<span class="arrow">→ stop at →</span>'+sw(s.to)+'</div>';
+    html+='<div class="counter"><div class="tally"><div class="n" aria-live="polite">'+n+'<small>drop'+(n===1?'':'s')+'</small></div>'+(s.unit!=='drops'?'<div class="v"><div class="eyebrow">'+s.label+'</div><div class="big">'+fmt(val,s.dec)+' '+s.unit+'</div></div>':'')+'</div>'+
+      '<button class="drop" id="drop">+1 drop<small>tap after each drop, then swirl</small></button>'+
+      '<div class="minor"><button class="btn ghost" id="undo"'+(n?'':' disabled')+'>Undo a drop</button><button class="btn ghost" id="typeCount">Type a number</button></div>'+
+      '<div class="field" id="typeWrap" hidden><label for="typeIn">Drops counted</label><input class="input num" id="typeIn" type="number" inputmode="numeric" min="0" step="1" value="'+(n||'')+'"></div></div>';
+    canNext=n>=s.min;
+    nextLabel=s.unit==='drops'?'Record '+n+' drop'+(n===1?'':'s'):'Changed color · '+fmt(val,s.dec)+' '+s.unit;
+  }
+  if(s.type==='pick'){
+    var cur_v=r[s.key];
+    function pk(v,cls,label){var c=s.map?nearestColor(s.map,num(v)||0):null;if(s.map&&v==='0')c='clear';
+      return '<button class="pick'+(cls?' '+cls:'')+(cur_v===v?' sel':'')+'" data-pick="'+esc(v)+'">'+(c&&cls!=='half'&&cls!=='wide'?sw(c):'')+'<span>'+esc(label||v)+'</span></button>'}
+    html+='<div class="picker">'+s.main.map(function(v){return pk(v)}).join('')+(s.extra||[]).map(function(x){return pk(x.v,'wide',x.label)}).join('')+'</div>';
+    if(s.halves)html+='<div class="eyebrow subhead">'+(s.halvesLabel||'In between')+'</div><div class="picker">'+s.halves.map(function(v){return pk(v,'half')}).join('')+'</div>';
+    if(s.map)html+='<p class="muted small" style="margin:10px 0 0">Screen colors are approximate. Always match against the comparator in your kit.</p>';
+    html+='<div class="field" style="margin-top:12px"><label for="custom">Or type the value</label><input class="input num" id="custom" inputmode="decimal" placeholder="e.g. '+esc(s.main[3])+'" value="'+(cur_v!=null&&s.main.indexOf(cur_v)<0&&(s.halves||[]).indexOf(cur_v)<0&&!(s.extra||[]).some(function(x){return x.v===cur_v})?esc(cur_v):'')+'"></div>';
+    canNext=cur_v!=null&&cur_v!=='';nextLabel=canNext?'Record '+cur_v+(s.unit?' '+s.unit:''):'Pick a value';
+  }
+  if(s.type==='number'){
+    html+='<div class="field" style="margin-top:16px"><label for="numIn">'+s.label+'</label><input class="input num" id="numIn" type="number" inputmode="decimal" min="'+s.min+'" max="'+s.max+'" step="'+s.step+'" value="'+(r[s.key]!=null?esc(r[s.key]):'')+'"></div>';
+    canNext=true;nextLabel=r[s.key]!=null&&r[s.key]!==''?'Record '+r[s.key]+' °F':'Skip';
+  }
+  if(s.type==='clresult'){
+    var o=calc(cur);
+    html+='<h2 style="margin-top:16px">Chlorine done</h2><div class="results">'+
+      resTile('Free chlorine',o.fcS,'ppm','fc',o.fc)+resTile('Combined chlorine',o.ccS,'ppm','cc',o.cc)+resTile('Total chlorine',o.tcS,'ppm',null,o.tc,true)+'</div>';
+    if(cur.kit==='K2006')html+='<p class="muted small">Free = '+(r.fcDrops||0)+' drops × '+(cur.fasSample===10?'0.5':'0.2')+'. Combined = '+(r.ccDrops||0)+' drops × '+(cur.fasSample===10?'0.5':'0.2')+'. Total = free + combined.</p>';
+    else html+='<p class="muted small">Combined = total − free.</p>';
+    if(o.cc!=null&&o.cc>db.settings.ranges.cc[1])html+='<div class="tip warn"><b>Combined chlorine is high</b>Chloramines cause the "chlorine smell" and eye irritation. Follow your facility\'s procedure, usually superchlorinating to breakpoint.</div>';
+    if(o.fc!=null&&o.fc<1)html+='<div class="tip warn"><b>Free chlorine is low</b>Most health codes require at least 1.0 ppm in pools. Tell your supervisor before swimmers use the pool.</div>';
+    nextLabel='Next: pH';
+  }
+  if(s.type==='summary'){html+=summaryHTML(cur);nextLabel='Save to log'}
+  if(s.tip)html+='<div class="tip'+(s.warn?' warn':'')+'"><b>Tip</b>'+s.tip+'</div>';
+  html+='</div>';
+  app.innerHTML=html;
+  setDock((cur.step>0?'<button class="btn ghost back" id="prev">Back</button>':'')+'<button class="btn primary" id="next"'+(canNext?'':' disabled')+'>'+esc(nextLabel)+'</button>');
+
+  /* handlers */
+  document.getElementById('exit').onclick=function(){save();go('home');toast('Test saved. Resume any time.')};
+  var prev=document.getElementById('prev');if(prev)prev.onclick=function(){cur.step=Math.max(0,cur.step-1);save();renderStep();window.scrollTo(0,0)};
+  document.getElementById('next').onclick=function(){
+    if(s.type==='summary'){finish();return}
+    if(s.type==='number'){var v=document.getElementById('numIn').value;r[s.key]=v===''?null:v}
+    if(s.type==='pick'){var cv=document.getElementById('custom').value.trim();if(cv)r[s.key]=cv}
+    advance();
+  };
+  if(s.type==='choice')app.querySelectorAll('[data-choice]').forEach(function(b){b.onclick=function(){
+    var old=r[s.key];r[s.key]=b.dataset.choice;
+    if(old!==r[s.key]){if(s.key==='fcPink'&&r.fcPink==='no')delete r.fcDrops;if(s.key==='ccPink'&&r.ccPink==='no')delete r.ccDrops}
+    save();setTimeout(advance,180);renderStep()}});
+  if(s.type==='count'){
+    document.getElementById('drop').onclick=function(){r[s.key]=(r[s.key]||0)+1;buzz();save();renderStep()};
+    document.getElementById('undo').onclick=function(){r[s.key]=Math.max(0,(r[s.key]||0)-1);save();renderStep()};
+    document.getElementById('typeCount').onclick=function(){var w=document.getElementById('typeWrap');w.hidden=false;document.getElementById('typeIn').focus()};
+    document.getElementById('typeIn').onchange=function(){var v=parseInt(this.value,10);r[s.key]=isNaN(v)?0:Math.max(0,v);save();renderStep()};
+  }
+  if(s.type==='pick'){
+    app.querySelectorAll('[data-pick]').forEach(function(b){b.onclick=function(){r[s.key]=b.dataset.pick;document.getElementById('custom').value='';save();renderStep()}});
+    document.getElementById('custom').oninput=function(){var v=this.value.trim();var nb=document.getElementById('next');
+      if(v){nb.disabled=false;nb.textContent='Record '+v+(s.unit?' '+s.unit:'');app.querySelectorAll('.pick.sel').forEach(function(p){p.classList.remove('sel')})}
+      else{nb.disabled=r[s.key]==null;}};
+  }
+  if(s.type==='number'){document.getElementById('numIn').oninput=function(){var nb=document.getElementById('next');nb.textContent=this.value?'Record '+this.value+' °F':'Skip'}}
+  if(s.type==='summary')bindSummary(cur);
+}
+function advance(){var cur=db.current;var n=buildSteps(cur).length;cur.step=Math.min(n-1,cur.step+1);save();renderStep();window.scrollTo(0,0)}
+
+function resTile(k,vs,unit,key,v,full){
+  var st=key?status(key,v):null;
+  return '<div class="res'+(full?' full':'')+'"><span class="k">'+k+'</span><span class="v">'+esc(vs)+(vs!=='—'&&unit?'<small>'+unit+'</small>':'')+'</span>'+(key&&v!=null?'<span class="st">'+pill(st,v,key)+'</span>':'')+'</div>';
+}
+function summaryHTML(cur){
+  var o=calc(cur),x=cur.extra,t=cur.tests,h='';
+  h+='<h2 style="margin-top:16px">Your log entry</h2><p class="muted" style="margin:0 0 12px">'+esc(cur.pool)+' · '+new Date(cur.startedAt).toLocaleString(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+'</p>';
+  h+='<div class="results">'+resTile('Free chlorine',o.fcS,'ppm','fc',o.fc)+resTile('Combined chlorine',o.ccS,'ppm','cc',o.cc)+resTile('Total chlorine',o.tcS,'ppm',null,o.tc)+resTile('pH',o.phS,'','ph',o.ph);
+  if(t.ta)h+=resTile('Total alkalinity',o.ta==null?'—':String(o.ta),'ppm','ta',o.ta);
+  if(t.ch)h+=resTile('Calcium hardness',o.ch==null?'—':String(o.ch),'ppm','ch',o.ch);
+  if(t.cya)h+=resTile('Cyanuric acid',o.cyaS,'ppm','cya',o.cya);
+  if(t.temp)h+=resTile('Water temp',o.temp==null?'—':String(o.temp),'°F',null,o.temp);
+  if(o.lsi!=null)h+=resTile('Saturation index (LSI)',(o.lsi>0?'+':'')+o.lsi.toFixed(2),'','lsi',o.lsi);
+  if(o.demand!=null)h+=resTile(parseFloat(cur.r.phRead)>db.settings.ranges.ph[1]?'Acid demand':'Base demand',String(o.demand),'drops',null,o.demand);
+  h+='</div>';
+  if(o.lsi!=null)h+='<p class="muted small">LSI uses Taylor\'s factors: pH + temperature + calcium + carbonate alkalinity − 12.1'+(o.cya?', with alkalinity corrected for CYA (TA − CYA ÷ 3)':'')+'. Negative is corrosive, positive is scale-forming.</p>';
+  h+='<div class="stack" style="margin-top:16px">';
+  h+='<div class="field"><span class="eyebrow">Main drain visible from the deck?</span><div class="toggles"><button class="tog'+(x.drain==='Yes'?' on':'')+'" data-drain="Yes">Yes, clear</button><button class="tog'+(x.drain==='No'?' on':'')+'" data-drain="No">No, cloudy</button></div></div>';
+  h+='<div class="field"><label for="chems">Chemicals added</label><textarea class="input" id="chems" placeholder="e.g. 2 gal 12.5% liquid chlorine, 1 qt muriatic acid">'+esc(x.chems)+'</textarea></div>';
+  h+='<div class="field"><label for="notes">Notes</label><textarea class="input" id="notes" placeholder="Bather load, weather, equipment issues">'+esc(x.notes)+'</textarea></div>';
+  h+='<div class="field"><label for="initials">Tested by (initials)</label><input class="input" id="initials" value="'+esc(x.initials)+'" autocomplete="off"></div>';
+  h+='</div>';
+  return h;
+}
+function bindSummary(cur){
+  var x=cur.extra;
+  app.querySelectorAll('[data-drain]').forEach(function(b){b.onclick=function(){x.drain=b.dataset.drain;save();app.querySelectorAll('[data-drain]').forEach(function(z){z.classList.toggle('on',z.dataset.drain===x.drain)})}});
+  ['chems','notes','initials'].forEach(function(id){document.getElementById(id).oninput=function(){x[id]=this.value;save()}});
+}
+function finish(){
+  var cur=db.current,o=calc(cur);
+  var entry={id:cur.id,at:cur.startedAt,savedAt:Date.now(),pool:cur.pool,kit:cur.kit,fasSample:cur.fasSample,tests:cur.tests,r:cur.r,extra:cur.extra,calc:o};
+  db.history.push(entry);if(cur.extra.initials)db.settings.initials=cur.extra.initials;
+  db.current=null;save();keepAwake(false);toast('Saved to the log');go('entry',entry.id);
+}
+
+function entryText(h){
+  var c=h.calc,d=new Date(h.at),L=[];
+  L.push((db.settings.facility?db.settings.facility+' · ':'')+h.pool);
+  L.push(d.toLocaleDateString()+' '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}));
+  L.push('Free chlorine: '+c.fcS+' ppm');L.push('Combined chlorine: '+c.ccS+' ppm');L.push('Total chlorine: '+c.tcS+' ppm');L.push('pH: '+c.phS);
+  if(h.tests.ta)L.push('Total alkalinity: '+(c.ta==null?'—':c.ta)+' ppm');
+  if(h.tests.ch)L.push('Calcium hardness: '+(c.ch==null?'—':c.ch)+' ppm');
+  if(h.tests.cya)L.push('Cyanuric acid: '+c.cyaS+' ppm');
+  if(h.tests.temp&&c.temp!=null)L.push('Water temp: '+c.temp+' °F');
+  if(c.lsi!=null)L.push('Saturation index: '+(c.lsi>0?'+':'')+c.lsi.toFixed(2));
+  if(c.demand!=null)L.push('Acid/base demand: '+c.demand+' drops');
+  if(h.extra.drain)L.push('Main drain visible: '+h.extra.drain);
+  if(h.extra.chems)L.push('Chemicals added: '+h.extra.chems);
+  if(h.extra.notes)L.push('Notes: '+h.extra.notes);
+  if(h.extra.initials)L.push('Tested by: '+h.extra.initials);
+  L.push('Kit: '+KITS[h.kit].full);
+  return L.join('\n');
+}
+function renderEntry(){
+  var h=db.history.filter(function(x){return x.id===viewArg})[0];if(!h){go('home');return}
+  var c=h.calc,t=h.tests,d=new Date(h.at);
+  var html='<div class="top"><button class="iconbtn" id="back">Log</button><h1>'+esc(h.pool)+'</h1></div><div class="stack">';
+  html+='<p class="muted" style="margin:0">'+d.toLocaleString(undefined,{weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'})+'</p>';
+  html+='<div class="results">'+resTile('Free chlorine',c.fcS,'ppm','fc',c.fc)+resTile('Combined chlorine',c.ccS,'ppm','cc',c.cc)+resTile('Total chlorine',c.tcS,'ppm',null,c.tc)+resTile('pH',c.phS,'','ph',c.ph);
+  if(t.ta)html+=resTile('Total alkalinity',c.ta==null?'—':String(c.ta),'ppm','ta',c.ta);
+  if(t.ch)html+=resTile('Calcium hardness',c.ch==null?'—':String(c.ch),'ppm','ch',c.ch);
+  if(t.cya)html+=resTile('Cyanuric acid',c.cyaS,'ppm','cya',c.cya);
+  if(t.temp)html+=resTile('Water temp',c.temp==null?'—':String(c.temp),'°F',null,c.temp);
+  if(c.lsi!=null)html+=resTile('Saturation index (LSI)',(c.lsi>0?'+':'')+c.lsi.toFixed(2),'','lsi',c.lsi);
+  if(c.demand!=null)html+=resTile('Acid/base demand',String(c.demand),'drops',null,c.demand);
+  html+='</div>';
+  html+='<div class="card"><dl class="dl">'+
+    '<dt>Main drain visible</dt><dd>'+esc(h.extra.drain||'—')+'</dd>'+
+    '<dt>Chemicals added</dt><dd>'+esc(h.extra.chems||'—')+'</dd>'+
+    '<dt>Notes</dt><dd>'+esc(h.extra.notes||'—')+'</dd>'+
+    '<dt>Tested by</dt><dd>'+esc(h.extra.initials||'—')+'</dd>'+
+    '<dt>Kit</dt><dd>'+KITS[h.kit].full+'</dd></dl></div>';
+  html+='<textarea class="input copybox" id="copyBox" hidden aria-label="Log text"></textarea>';
+  html+='<div id="delZone"></div></div>';
+  app.innerHTML=html;
+  setDock('<button class="btn ghost back" id="del">Delete</button><button class="btn primary" id="copy">Copy for the log</button>');
+  document.getElementById('back').onclick=function(){go('home')};
+  document.getElementById('copy').onclick=function(){copyText(entryText(h),'Copied. Paste it into your log.',document.getElementById('copyBox'))};
+  document.getElementById('del').onclick=function(){
+    document.getElementById('delZone').innerHTML='<div class="confirm"><strong>Delete this test from the log?</strong><span class="small">This can\'t be undone.</span><div class="row"><button class="btn danger" id="delYes" style="flex:1">Delete</button><button class="btn ghost" id="delNo" style="flex:1">Keep it</button></div></div>';
+    document.getElementById('delYes').onclick=function(){db.history=db.history.filter(function(x){return x.id!==h.id});save();toast('Deleted');go('home')};
+    document.getElementById('delNo').onclick=function(){document.getElementById('delZone').innerHTML=''};
+    document.getElementById('delZone').scrollIntoView({behavior:'smooth',block:'center'});
+  };
+}
+
+function csvCell(v){v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function buildCSV(){
+  var head=['Date','Time','Facility','Pool','Free Cl (ppm)','Combined Cl (ppm)','Total Cl (ppm)','pH','Total Alkalinity (ppm)','Calcium Hardness (ppm)','CYA (ppm)','Water Temp (F)','LSI','Acid/Base Demand (drops)','Main Drain Visible','Chemicals Added','Notes','Tested By','Kit'];
+  var rows=db.history.map(function(h){var c=h.calc,d=new Date(h.at);
+    return [d.toLocaleDateString(),d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}),db.settings.facility,h.pool,c.fcS,c.ccS,c.tcS,c.phS,c.ta,c.ch,h.tests.cya?c.cyaS:'',c.temp,c.lsi,c.demand,h.extra.drain,h.extra.chems,h.extra.notes,h.extra.initials,KITS[h.kit].name].map(csvCell).join(',')});
+  return [head.join(',')].concat(rows).join('\n');
+}
+function exportCSV(){
+  var csv=buildCSV();
+  try{
+    var blob=new Blob([csv],{type:'text/csv'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='pool-log-'+new Date().toISOString().slice(0,10)+'.csv';
+    document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+  }catch(e){}
+  copyText(csv,'CSV downloaded and copied',document.getElementById('csvBox'));
+}
+
+function renderSettings(){
+  var S=db.settings,rg=S.ranges;
+  var html='<div class="top"><button class="iconbtn" id="back">Done</button><h1>Settings</h1></div><div class="stack">';
+  html+='<div class="field"><span class="eyebrow">Test kit</span>'+kitPickerHTML(S.kit)+'</div>';
+  if(S.kit==='K2006')html+='<div class="field"><span class="eyebrow">FAS-DPD chlorine sample</span><div class="toggles"><button class="tog'+(S.fasSample===25?' on':'')+'" data-fas="25">25 mL · 0.2 ppm per drop</button><button class="tog'+(S.fasSample===10?' on':'')+'" data-fas="10">10 mL · 0.5 ppm per drop</button></div><span class="muted small">Use 10 mL when chlorine is very high, to save reagent.</span></div>';
+  html+='<div class="field"><label for="fac">Facility name</label><input class="input" id="fac" value="'+esc(S.facility)+'" placeholder="Shown on copied log entries"></div>';
+  html+='<div class="field"><label for="ini">Your initials</label><input class="input" id="ini" value="'+esc(S.initials)+'"></div>';
+  html+='<div class="field"><span class="eyebrow">Pools and spas</span><div class="toggles" id="poolList">'+S.pools.map(function(p,i){return '<button class="tog on" data-rmpool="'+i+'" aria-label="Remove '+esc(p)+'">'+esc(p)+' <span aria-hidden="true">×</span></button>'}).join('')+'</div>'+
+    '<div class="row"><input class="input" id="newPool" placeholder="Add a pool, e.g. Spa" style="flex:1;min-width:0"><button class="btn" id="addPool" style="min-height:48px">Add</button></div></div>';
+  html+='<div class="field"><span class="eyebrow">Target ranges</span><span class="muted small">Common guidelines. Change them to match your health department and facility rules.</span>'+
+    '<div class="ranges"><span></span><span class="eyebrow" style="text-align:center">Min</span><span class="eyebrow" style="text-align:center">Max</span>'+
+    [['fc','Free chlorine (ppm)'],['cc','Combined chlorine (ppm)'],['ph','pH'],['ta','Total alkalinity (ppm)'],['ch','Calcium hardness (ppm)'],['cya','Cyanuric acid (ppm)'],['lsi','Saturation index']].map(function(x){
+      return '<label for="rg-'+x[0]+'-0">'+x[1]+'</label><input class="input" id="rg-'+x[0]+'-0" data-rg="'+x[0]+'" data-i="0" inputmode="decimal" value="'+rg[x[0]][0]+'"><input class="input" id="rg-'+x[0]+'-1" aria-label="'+x[1]+' max" data-rg="'+x[0]+'" data-i="1" inputmode="decimal" value="'+rg[x[0]][1]+'">'}).join('')+'</div></div>';
+  html+='<div class="field"><span class="eyebrow">Data</span><span class="muted small">'+db.history.length+' test'+(db.history.length===1?'':'s')+' saved on this phone.</span><div id="wipeZone"><button class="btn danger" id="wipe">Erase the whole log</button></div></div>';
+  html+='</div>';
+  app.innerHTML=html;setDock(null);
+  document.getElementById('back').onclick=function(){go('home')};
+  app.querySelectorAll('[data-kit]').forEach(function(b){b.onclick=function(){S.kit=b.dataset.kit;save();renderSettings()}});
+  app.querySelectorAll('[data-fas]').forEach(function(b){b.onclick=function(){S.fasSample=parseInt(b.dataset.fas,10);save();renderSettings()}});
+  document.getElementById('fac').oninput=function(){S.facility=this.value;save()};
+  document.getElementById('ini').oninput=function(){S.initials=this.value;save()};
+  app.querySelectorAll('[data-rmpool]').forEach(function(b){b.onclick=function(){if(S.pools.length<=1){toast('Keep at least one pool');return}S.pools.splice(+b.dataset.rmpool,1);save();renderSettings()}});
+  document.getElementById('addPool').onclick=function(){var v=document.getElementById('newPool').value.trim();if(!v)return;if(S.pools.indexOf(v)<0)S.pools.push(v);save();renderSettings()};
+  app.querySelectorAll('[data-rg]').forEach(function(inp){inp.onchange=function(){var v=parseFloat(this.value);if(!isNaN(v)){S.ranges[this.dataset.rg][+this.dataset.i]=v;save()}else this.value=S.ranges[this.dataset.rg][+this.dataset.i]}});
+  document.getElementById('wipe').onclick=function(){
+    document.getElementById('wipeZone').innerHTML='<div class="confirm"><strong>Erase all '+db.history.length+' saved tests?</strong><span class="small">Export a CSV first if you need a copy. This can\'t be undone.</span><div class="row"><button class="btn danger" id="wipeYes" style="flex:1">Erase log</button><button class="btn ghost" id="wipeNo" style="flex:1">Cancel</button></div></div>';
+    document.getElementById('wipeYes').onclick=function(){db.history=[];save();toast('Log erased');renderSettings()};
+    document.getElementById('wipeNo').onclick=function(){renderSettings()};
+  };
+}
+
+render();
+
+/* offline support when hosted (ignored where service workers aren't allowed) */
+try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(function(){})}}catch(e){}
+})();
+</script>
+<!--APP-BODY-END-->
+</body>
+</html>
