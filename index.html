@@ -256,9 +256,9 @@ textarea.input{min-height:84px;resize:vertical}
 var KEY='taylorPoolGuide.v1', SETTINGS_VERSION=2;
 var DEF_RANGES={fc:[1,3],cc:[0,0.2],ph:[7.2,7.8],ta:[80,120],ch:[200,400],cya:[30,50],phos:[0,100],lsi:[-0.3,0.3]};
 var DEF={
-  settings:{v:SETTINGS_VERSION,kit:'K2006',fasSample:25,initials:'',facility:'',pools:['Main pool'],
+  settings:{v:SETTINGS_VERSION,kit:'K2006',fasSample:25,initials:'',facility:'',pools:['Pool','Spa'],spaAdded:true,
     ranges:JSON.parse(JSON.stringify(DEF_RANGES)),
-    lastTests:{ta:true,ch:true,cya:true,demand:false},lastPool:'Main pool'},
+    lastTests:{ta:true,ch:true,cya:true,demand:false},lastPool:'Pool'},
   history:[],current:null
 };
 function clone(o){return JSON.parse(JSON.stringify(o))}
@@ -273,6 +273,8 @@ function load(){
       d.settings.ranges=Object.assign(clone(DEF_RANGES),ps.ranges||{});
       d.settings.lastTests=Object.assign(clone(DEF.settings.lastTests),ps.lastTests||{});
     }
+    /* make sure the spa is a choice once; if it's removed later in Settings it stays removed */
+    if(!ps.spaAdded){if(!d.settings.pools.some(function(x){return /spa/i.test(x)}))d.settings.pools.push('Spa');d.settings.spaAdded=true}
     d.history=Array.isArray(p.history)?p.history:[];d.current=p.current||null;
     if(d.current&&!d.current.extra)d.current.extra={};}}catch(e){}
   return d;
@@ -743,7 +745,7 @@ function renderHome(){
     html+='<p class="muted small" style="margin:0">Saved on this phone only. Export it regularly to keep a copy.</p>';
   }else{
     html+='<p class="muted" style="margin:0">Saved tests show up here. Tap one to see the readings again.</p>'+
-      histItem({pool:'Main pool',at:Date.now(),calc:{fc:2.4,cc:0.2,ph:7.4,ta:100,ch:280,cya:40,cyaS:'40'}},true);
+      histItem({pool:'Pool',at:Date.now(),calc:{fc:2.4,cc:0.2,ph:7.4,ta:100,ch:280,cya:40,cyaS:'40'}},true);
   }
   html+='</div>';
   app.innerHTML=html;setDock(null);
