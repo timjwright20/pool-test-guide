@@ -4,11 +4,11 @@ A phone web app that walks you through a Taylor professional pool test kit one s
 
 ## What it does
 
-- **Two kits supported**
-  - **Taylor K-2006 (FAS-DPD):** you count drops for chlorine. Tap a big **+1 drop** button for each drop and the app converts the count to ppm (0.2 ppm per drop at 25 mL, 0.5 at 10 mL).
-  - **Taylor K-2005 (DPD):** you match the pink color against the comparator for chlorine.
+- **Built for the Taylor K-2006 (FAS-DPD) kit.** Every reagent step shows a map of the open case with the right cap color lit up: yellow for chlorine, red for pH, green for alkalinity, blue for calcium, white for CYA.
+- **Animated steps:** dipping the sample tube to elbow depth, filling to the 10 or 25 mL line, drops that count themselves (5 of 5, 20 of 20), DPD powder dippers, the pH comparator, the CYA mixing bottle and the view tube.
+- **Chlorine by drop count:** tap **+1 drop** for each drop and the app converts the count to ppm (0.2 ppm per drop at 25 mL, 0.5 at 10 mL). The K-2005 (DPD color-match) kit is still in Settings.
 - **Tests:** free, combined and total chlorine; pH; acid/base demand; total alkalinity (R-0007 / R-0008 / R-0009, ×10); calcium hardness (R-0010 / R-0011L / R-0012, ×10); cyanuric acid (R-0013 and the view tube); water temperature.
-- **Log entry:** checks each result against target ranges you can edit, works out the Langelier saturation index, and records whether the main drain is visible, chemicals added, notes and initials.
+- **Log entry:** laid out like the facility's Chemical Readings screen: free chlorine, combined chlorine, pH, total alkalinity, calcium hardness, cyanuric acid, phosphate and water temperature, in that order, with the same ideal ranges. It also shows total chlorine and the saturation index (same math as the Taylor Watergram).
 - **Pool log:** saved on the phone. You can copy any entry as text or export everything as a CSV.
 - **Works offline** once it's installed, and keeps the screen awake during a test.
 
@@ -33,6 +33,7 @@ No build step. It's plain HTML, CSS and JavaScript.
 | `manifest.webmanifest` | Home-screen name, icon and colors |
 | `sw.js` | Offline cache. Change `VERSION` when you edit `index.html` |
 | `icons/` | App icons |
+| `img/` | Photos of the kit and the Watergram |
 | `vercel.json` | Cache headers for the service worker |
 
 ## Important
