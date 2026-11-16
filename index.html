@@ -256,7 +256,7 @@ textarea.input{min-height:84px;resize:vertical}
 var KEY='taylorPoolGuide.v1', SETTINGS_VERSION=2;
 var DEF_RANGES={fc:[1,3],cc:[0,0.2],ph:[7.2,7.8],ta:[80,120],ch:[200,400],cya:[30,50],phos:[0,100],lsi:[-0.3,0.3]};
 var DEF={
-  settings:{v:SETTINGS_VERSION,kit:'K2006',fasSample:25,initials:'',facility:'',pools:['Pool','Spa'],spaAdded:true,
+  settings:{v:SETTINGS_VERSION,kit:'K2006',fasSample:25,chSample:10,locations:{},initials:'',facility:'',pools:['Pool','Spa'],spaAdded:true,
     ranges:JSON.parse(JSON.stringify(DEF_RANGES)),
     lastTests:{ta:true,ch:true,cya:true,demand:false},lastPool:'Pool'},
   history:[],current:null
@@ -547,6 +547,8 @@ function sceneHTML(sc){
 function R(code,name,amt,unit){return{code:code,name:name,amt:amt,unit:unit}}
 var PH_VALUES={K2006:['7.0','7.2','7.4','7.6','7.8','8.0'],K2005:['6.8','7.0','7.2','7.4','7.6','7.8','8.0','8.2']};
 var PH_HALVES={K2006:['7.1','7.3','7.5','7.7','7.9'],K2005:['6.9','7.1','7.3','7.5','7.7','7.9','8.1']};
+function chSampleOf(cur){return cur.chSample===10?10:25}
+function chFactor(cur){return chSampleOf(cur)===10?25:10}
 function buildSteps(cur){
   var t=cur.tests,s=[],k=cur.kit,f=cur.fasSample===10?0.5:0.2,mL=cur.fasSample===10?10:25,dip=cur.fasSample===10?1:2;
   var pv=PH_VALUES[k],ph=PH_HALVES[k];
@@ -631,14 +633,18 @@ function buildSteps(cur){
       tip:'Each drop = 10 ppm with a 25 mL sample.'});
   }
   if(t.ch){
-    s.push({id:'ch-fill',group:'Calcium',type:'do',title:'Fill the sample tube to 25 mL',scene:{kind:'tube',ml:25,liquid:'water',fill:true,mark:true},body:'<p>Rinse the tall sample tube and fill to the <b>25 mL</b> line.</p>'});
-    s.push({id:'ch-10',group:'Calcium',type:'do',title:'Add 20 drops of R-0010',scene:{kind:'tube',ml:25,liquid:'water',bottle:'var(--cap-blue)',drops:20},reagents:[R('R-0010','Calcium Buffer',20,'drops')],body:'<p>Add <b>20 drops R-0010</b> and swirl. Count along with the animation.</p>'});
-    s.push({id:'ch-11',group:'Calcium',type:'do',title:'Add 5 drops of R-0011L',scene:{kind:'tube',ml:25,liquid:'water',after:C.chRed,bottle:'var(--cap-blue)',drops:5,dropColor:'#7a2448'},reagents:[R('R-0011L','Calcium Hardness Indicator',5,'drops')],body:'<p>Add <b>5 drops R-0011L</b> and swirl. The sample turns <b>red</b> if calcium is present.</p>'});
-    s.push({id:'ch-12',group:'Calcium',type:'count',key:'chDrops',factor:10,unit:'ppm',dec:0,min:1,label:'Calcium hardness',
-      scene:{kind:'tube',ml:25,liquid:C.chRed,bottle:'var(--cap-blue)'},
+    /* 10 mL is Taylor's short version (the kit lid says "multiply by 25"); buffer and indicator scale with the sample */
+    var cm=chSampleOf(cur),cBuf=cm===10?8:20,cInd=cm===10?2:5,cf=chFactor(cur);
+    s.push({id:'ch-fill',group:'Calcium',type:'do',title:'Fill the sample tube to '+cm+' mL',scene:{kind:'tube',ml:cm,liquid:'water',fill:true,mark:true},
+      body:'<p>Rinse the tall sample tube and fill to the <b>'+cm+' mL</b> line.</p>',
+      tip:cm===10?'The smaller sample means far fewer drops. Each R-0012 drop counts as 25 ppm.':null});
+    s.push({id:'ch-10',group:'Calcium',type:'do',title:'Add '+cBuf+' drops of R-0010',scene:{kind:'tube',ml:cm,liquid:'water',bottle:'var(--cap-blue)',drops:cBuf},reagents:[R('R-0010','Calcium Buffer',cBuf,'drops')],body:'<p>Add <b>'+cBuf+' drops R-0010</b> and swirl. Count along with the animation.</p>'});
+    s.push({id:'ch-11',group:'Calcium',type:'do',title:'Add '+cInd+' drops of R-0011L',scene:{kind:'tube',ml:cm,liquid:'water',after:C.chRed,bottle:'var(--cap-blue)',drops:cInd,dropColor:'#7a2448'},reagents:[R('R-0011L','Calcium Hardness Indicator',cInd,'drops')],body:'<p>Add <b>'+cInd+' drops R-0011L</b> and swirl. The sample turns <b>red</b> if calcium is present.</p>'});
+    s.push({id:'ch-12',group:'Calcium',type:'count',key:'chDrops',factor:cf,unit:'ppm',dec:0,min:1,label:'Calcium hardness',
+      scene:{kind:'tube',ml:cm,liquid:C.chRed,bottle:'var(--cap-blue)'},
       title:'Count drops until red turns blue',reagents:[R('R-0012','Hardness Reagent',1,'at a time')],
       body:'<p>Add R-0012 one drop at a time. Swirl and tap after each drop. Stop when it turns <b>blue</b> with no red or purple left.</p>',from:C.chRed,to:C.chBlue,
-      tip:'Each drop = 10 ppm with a 25 mL sample.'});
+      tip:'Each drop = '+cf+' ppm with a '+cm+' mL sample.'+(cur.indoor?' This is the last test for an indoor pool.':'')});
   }
   if(t.cya){
     s.push({id:'cya-mix',group:'Stabilizer (CYA)',type:'do',title:'Fill the mixing bottle and shake',scene:{kind:'cyamix'},reagents:[R('R-0013','Cyanuric Acid Reagent','to','upper mark')],
@@ -679,7 +685,7 @@ function calc(cur){
   }
   o.ph=num(r.phRead);o.phS=r.phRead||'—';
   o.ta=r.taDrops?r.taDrops*10:null;
-  o.ch=r.chDrops?r.chDrops*10:null;
+  o.ch=r.chDrops?r.chDrops*chFactor(cur):null;
   o.cya=num(r.cyaRead);o.cyaS=r.cyaRead||'—';if(r.cyaRead==='<20')o.cya=0;
   o.temp=num(r.temp);
   o.phos=num((cur.extra||{}).phos);
@@ -723,7 +729,7 @@ function histItem(h,example){
   chip('FC',c.fc,'fc');chip('CC',c.cc,'cc');chip('pH',c.ph,'ph');
   if(c.ta!=null)chip('TA',c.ta,'ta');if(c.ch!=null)chip('CH',c.ch,'ch');if(c.cya!=null)chip('CYA',c.cyaS,'cya');
   var d=new Date(h.at),tag=example?'div':'button';
-  return '<'+tag+' class="hitem'+(example?' example':'')+'"'+(example?'':' data-open="'+esc(h.id)+'"')+'><div class="h"><span>'+(example?'Example · ':'')+esc(h.pool)+'</span><span>'+d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})+'</span></div><div class="chips">'+chips.join('')+'</div></'+tag+'>';
+  return '<'+tag+' class="hitem'+(example?' example':'')+'"'+(example?'':' data-open="'+esc(h.id)+'"')+'><div class="h"><span>'+(example?'Example · ':'')+esc(h.pool)+(h.indoor?' · Indoor':'')+'</span><span>'+d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})+'</span></div><div class="chips">'+chips.join('')+'</div></'+tag+'>';
 }
 
 function renderHome(){
@@ -781,21 +787,27 @@ function renderSetup(){
   var S=db.settings;
   if(!setupState)setupState={pool:S.lastPool&&S.pools.indexOf(S.lastPool)>=0?S.lastPool:S.pools[0],tests:clone(S.lastTests)};
   var st=setupState;
+  if(!st.loc)st.loc=(S.locations||{})[st.pool]||'outdoor';
+  var indoor=st.loc==='indoor';
   var html='<div class="top"><button class="iconbtn" id="back">Back</button><h1>New test</h1></div><div class="stack">';
   html+='<div class="field"><span class="eyebrow">Pool or spa</span><div class="toggles">'+S.pools.map(function(p){return '<button class="tog'+(st.pool===p?' on':'')+'" data-pool="'+esc(p)+'" aria-pressed="'+(st.pool===p)+'">'+esc(p)+'</button>'}).join('')+'</div></div>';
-  html+='<div class="field"><span class="eyebrow">Tests to run</span><div class="toggles">'+TESTS.map(function(t){var on=t[2]||st.tests[t[0]];
-    return '<button class="tog'+(on?' on':'')+(t[2]?' locked':'')+'" data-test="'+t[0]+'" aria-pressed="'+on+'"'+(t[2]?' aria-disabled="true"':'')+'><span class="chk">'+(on?'✓':'')+'</span>'+t[1]+'</button>'}).join('')+'</div>'+
+  html+='<div class="field"><span class="eyebrow">Indoor or outdoor</span><div class="toggles">'+[['outdoor','Outdoor'],['indoor','Indoor']].map(function(o){return '<button class="tog'+(st.loc===o[0]?' on':'')+'" data-loc="'+o[0]+'" aria-pressed="'+(st.loc===o[0])+'">'+o[1]+'</button>'}).join('')+'</div>'+
+    '<span class="muted small">'+(indoor?'Indoor tests end after calcium hardness. The cyanuric acid (stabilizer) test is skipped.':'Outdoor tests include every step, ending with cyanuric acid (stabilizer).')+'</span></div>';
+  html+='<div class="field"><span class="eyebrow">Tests to run</span><div class="toggles">'+TESTS.map(function(t){var skip=indoor&&t[0]==='cya',lock=t[2]||skip,on=!skip&&(t[2]||st.tests[t[0]]);
+    return '<button class="tog'+(on?' on':'')+(lock?' locked':'')+'" data-test="'+t[0]+'" aria-pressed="'+on+'"'+(lock?' aria-disabled="true"':'')+'><span class="chk">'+(on?'✓':'')+'</span>'+t[1]+(skip?' (skipped indoors)':'')+'</button>'}).join('')+'</div>'+
     '<span class="muted small">Your log requires free chlorine, pH, alkalinity and calcium. Water temperature is always asked.</span></div>';
-  html+='<div class="card small"><div class="dl"><dt>Kit</dt><dd>'+KITS[S.kit].full+'</dd>'+(S.kit==='K2006'?'<dt>Chlorine sample</dt><dd>'+S.fasSample+' mL ('+(S.fasSample===10?'0.5':'0.2')+' ppm per drop)</dd>':'')+'</div></div>';
+  html+='<div class="card small"><div class="dl"><dt>Kit</dt><dd>'+KITS[S.kit].full+'</dd>'+(S.kit==='K2006'?'<dt>Chlorine sample</dt><dd>'+S.fasSample+' mL ('+(S.fasSample===10?'0.5':'0.2')+' ppm per drop)</dd>':'')+'<dt>Calcium sample</dt><dd>'+(S.chSample===10?'10 mL (25 ppm per drop)':'25 mL (10 ppm per drop)')+'</dd></div></div>';
   html+='</div>';
   app.innerHTML=html;
   setDock('<button class="btn primary" id="go">Begin</button>');
   document.getElementById('back').onclick=function(){setupState=null;go('home')};
-  app.querySelectorAll('[data-pool]').forEach(function(b){b.onclick=function(){st.pool=b.dataset.pool;renderSetup()}});
-  app.querySelectorAll('[data-test]').forEach(function(b){b.onclick=function(){var k=b.dataset.test;if(k==='chlorine'||k==='ph')return;st.tests[k]=!st.tests[k];renderSetup()}});
+  app.querySelectorAll('[data-pool]').forEach(function(b){b.onclick=function(){st.pool=b.dataset.pool;st.loc=(S.locations||{})[st.pool]||'outdoor';renderSetup()}});
+  app.querySelectorAll('[data-loc]').forEach(function(b){b.onclick=function(){st.loc=b.dataset.loc;renderSetup()}});
+  app.querySelectorAll('[data-test]').forEach(function(b){b.onclick=function(){var k=b.dataset.test;if(k==='chlorine'||k==='ph'||(indoor&&k==='cya'))return;st.tests[k]=!st.tests[k];renderSetup()}});
   document.getElementById('go').onclick=function(){
-    S.lastTests=clone(st.tests);S.lastPool=st.pool;
-    db.current={id:'t'+Date.now(),startedAt:Date.now(),pool:st.pool,tests:clone(st.tests),kit:S.kit,fasSample:S.fasSample,step:0,r:{},extra:{drain:null,chems:'',notes:'',initials:S.initials,phos:''}};
+    S.lastTests=clone(st.tests);S.lastPool=st.pool;S.locations=S.locations||{};S.locations[st.pool]=st.loc;
+    var tests=clone(st.tests);if(indoor)tests.cya=false;
+    db.current={id:'t'+Date.now(),startedAt:Date.now(),pool:st.pool,indoor:indoor,tests:tests,kit:S.kit,fasSample:S.fasSample,chSample:S.chSample===10?10:25,step:0,r:{},extra:{drain:null,chems:'',notes:'',initials:S.initials,phos:''}};
     setupState=null;save();keepAwake(true);go('step');
   };
 }
@@ -906,11 +918,11 @@ function resTile(k,vs,unit,key,v){
   return '<div class="res"><span class="k">'+k+'</span><span class="v">'+esc(vs)+(vs!=='—'&&unit?'<small>'+unit+'</small>':'')+'</span>'+(st?'<span>'+pill(st,v,key)+'</span>':'')+'</div>';
 }
 /* Mirrors the facility's "Chemical Readings" screen, field for field, in the same order. */
-function logRows(o,t,editable,ex){
+function logRows(o,t,editable,ex,indoor){
   function row(label,req,key,vs,v,tested){
     var st=status(key,v),empty=vs==null||vs==='—'||vs==='';
     return '<div class="lrow"><span class="lab">'+label+(req?'<span class="req">*</span>':'')+'</span><span class="ideal">'+rangeText(key)+(req?'':' (optional)')+'</span>'+
-      '<span class="val"><span class="num'+(empty?' empty':'')+'">'+(empty?(tested===false?'not tested':'—'):esc(vs))+'</span>'+(st&&!empty?pill(st,v,key):'')+'</span></div>';
+      '<span class="val"><span class="num'+(empty?' empty':'')+'">'+(empty?(tested===false?(indoor&&key==='cya'?'skipped (indoor)':'not tested'):'—'):esc(vs))+'</span>'+(st&&!empty?pill(st,v,key):'')+'</span></div>';
   }
   var h='<div class="logform">';
   h+=row('Free Chlorine (ppm)',true,'fc',o.fcS,o.fc);
@@ -926,8 +938,8 @@ function logRows(o,t,editable,ex){
 }
 function summaryHTML(cur){
   var o=calc(cur),x=cur.extra,t=cur.tests,h='';
-  h+='<h2>Fill in your pool log</h2><p class="muted" style="margin:0 0 12px">'+esc(cur.pool)+' · '+new Date(cur.startedAt).toLocaleString(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+'. Enter these in Chemical Readings, top to bottom.</p>';
-  h+=logRows(o,t,true,x);
+  h+='<h2>Fill in your pool log</h2><p class="muted" style="margin:0 0 12px">'+esc(cur.pool)+' · '+(cur.indoor?'Indoor':'Outdoor')+' · '+new Date(cur.startedAt).toLocaleString(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+'. Enter these in Chemical Readings, top to bottom.</p>';
+  h+=logRows(o,t,true,x,cur.indoor);
   h+='<div class="extra" style="margin-top:12px">'+resTile('Total chlorine',o.tcS,'ppm',null,o.tc);
   h+=o.lsi!=null?resTile('Saturation index',(o.lsi>0?'+':'')+o.lsi.toFixed(2),'','lsi',o.lsi):'<div class="res"><span class="k">Saturation index</span><span class="v" style="font-size:18px;color:var(--muted)">needs pH, TA, CH and temp</span></div>';
   if(o.demand!=null)h+=resTile(parseFloat(cur.r.phRead)>db.settings.ranges.ph[1]?'Acid demand':'Base demand',String(o.demand),'drops',null,o.demand);
@@ -948,19 +960,19 @@ function bindSummary(cur){
 }
 function finish(){
   var cur=db.current,o=calc(cur);
-  var entry={id:cur.id,at:cur.startedAt,savedAt:Date.now(),pool:cur.pool,kit:cur.kit,fasSample:cur.fasSample,tests:cur.tests,r:cur.r,extra:cur.extra,calc:o};
+  var entry={id:cur.id,at:cur.startedAt,savedAt:Date.now(),pool:cur.pool,indoor:!!cur.indoor,chSample:chSampleOf(cur),kit:cur.kit,fasSample:cur.fasSample,tests:cur.tests,r:cur.r,extra:cur.extra,calc:o};
   db.history.push(entry);if(cur.extra.initials)db.settings.initials=cur.extra.initials;
   db.current=null;save();keepAwake(false);toast('Saved to the log');go('entry',entry.id);
 }
 
 function entryText(h){
   var c=h.calc,d=new Date(h.at),L=[],t=h.tests,ph=c.phos!==undefined?c.phos:num(h.extra&&h.extra.phos);
-  L.push((db.settings.facility?db.settings.facility+' · ':'')+h.pool);
+  L.push((db.settings.facility?db.settings.facility+' · ':'')+h.pool+' ('+(h.indoor?'indoor':'outdoor')+')');
   L.push(d.toLocaleDateString()+' '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}));
   L.push('Free Chlorine (ppm): '+c.fcS);L.push('Combined Chlorine (ppm): '+c.ccS);L.push('pH: '+c.phS);
   L.push('Total Alkalinity (ppm): '+(c.ta==null?'—':c.ta));
   L.push('Calcium Hardness (ppm): '+(c.ch==null?'—':c.ch));
-  L.push('Cyanuric Acid (ppm): '+(t.cya?c.cyaS:'—'));
+  L.push('Cyanuric Acid (ppm): '+(t.cya?c.cyaS:(h.indoor?'skipped (indoor)':'—')));
   L.push('Phosphate (ppb): '+(ph==null?'—':ph));
   L.push('Water Temp (°F): '+(c.temp==null?'—':c.temp));
   L.push('Total Chlorine (ppm): '+c.tcS);
@@ -977,8 +989,8 @@ function renderEntry(){
   var c=h.calc,d=new Date(h.at);
   if(c.phos===undefined)c.phos=num(h.extra&&h.extra.phos);
   var html='<div class="top"><button class="iconbtn" id="back">Log</button><h1>'+esc(h.pool)+'</h1></div><div class="stack">';
-  html+='<p class="muted" style="margin:0">'+d.toLocaleString(undefined,{weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'})+'</p>';
-  html+=logRows(c,h.tests,false,h.extra);
+  html+='<p class="muted" style="margin:0">'+(h.indoor?'Indoor':'Outdoor')+' · '+d.toLocaleString(undefined,{weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'})+'</p>';
+  html+=logRows(c,h.tests,false,h.extra,h.indoor);
   html+='<div class="extra">'+resTile('Total chlorine',c.tcS,'ppm',null,c.tc)+(c.lsi!=null?resTile('Saturation index',(c.lsi>0?'+':'')+c.lsi.toFixed(2),'','lsi',c.lsi):'')+(c.demand!=null?resTile('Acid/base demand',String(c.demand),'drops',null,c.demand):'')+'</div>';
   html+='<div class="card"><dl class="dl">'+
     '<dt>Main drain visible</dt><dd>'+esc(h.extra.drain||'—')+'</dd>'+
@@ -1002,9 +1014,9 @@ function renderEntry(){
 
 function csvCell(v){v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
 function buildCSV(){
-  var head=['Date','Time','Facility','Pool','Free Chlorine (ppm)','Combined Chlorine (ppm)','pH','Total Alkalinity (ppm)','Calcium Hardness (ppm)','Cyanuric Acid (ppm)','Phosphate (ppb)','Water Temp (F)','Total Chlorine (ppm)','Saturation Index','Acid/Base Demand (drops)','Main Drain Visible','Chemicals Added','Notes','Tested By','Kit'];
+  var head=['Date','Time','Facility','Pool','Indoor/Outdoor','Free Chlorine (ppm)','Combined Chlorine (ppm)','pH','Total Alkalinity (ppm)','Calcium Hardness (ppm)','Cyanuric Acid (ppm)','Phosphate (ppb)','Water Temp (F)','Total Chlorine (ppm)','Saturation Index','Acid/Base Demand (drops)','Main Drain Visible','Chemicals Added','Notes','Tested By','Kit'];
   var rows=db.history.map(function(h){var c=h.calc,d=new Date(h.at),ph=c.phos!==undefined?c.phos:num(h.extra&&h.extra.phos);
-    return [d.toLocaleDateString(),d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}),db.settings.facility,h.pool,c.fcS,c.ccS,c.phS,c.ta,c.ch,h.tests.cya?c.cyaS:'',ph,c.temp,c.tcS,c.lsi,c.demand,h.extra.drain,h.extra.chems,h.extra.notes,h.extra.initials,KITS[h.kit].name].map(csvCell).join(',')});
+    return [d.toLocaleDateString(),d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}),db.settings.facility,h.pool,h.indoor?'Indoor':'Outdoor',c.fcS,c.ccS,c.phS,c.ta,c.ch,h.tests.cya?c.cyaS:'',ph,c.temp,c.tcS,c.lsi,c.demand,h.extra.drain,h.extra.chems,h.extra.notes,h.extra.initials,KITS[h.kit].name].map(csvCell).join(',')});
   return [head.join(',')].concat(rows).join('\n');
 }
 function exportCSV(){
@@ -1021,6 +1033,7 @@ function renderSettings(){
   var S=db.settings,rg=S.ranges;
   var html='<div class="top"><button class="iconbtn" id="back">Done</button><h1>Settings</h1></div><div class="stack">';
   if(S.kit==='K2006')html+='<div class="field"><span class="eyebrow">FAS-DPD chlorine sample</span><div class="toggles"><button class="tog'+(S.fasSample===25?' on':'')+'" data-fas="25">25 mL · 0.2 ppm per drop</button><button class="tog'+(S.fasSample===10?' on':'')+'" data-fas="10">10 mL · 0.5 ppm per drop</button></div><span class="muted small">Use 10 mL when chlorine is very high, to save reagent.</span></div>';
+  html+='<div class="field"><span class="eyebrow">Calcium hardness sample</span><div class="toggles"><button class="tog'+(S.chSample===10?' on':'')+'" data-chs="10">10 mL · 25 ppm per drop</button><button class="tog'+(S.chSample!==10?' on':'')+'" data-chs="25">25 mL · 10 ppm per drop</button></div><span class="muted small">10 mL uses 8 drops R-0010, 2 drops R-0011L and far fewer R-0012 drops. 25 mL is more precise but takes about 50 drops.</span></div>';
   html+='<div class="field"><label for="fac">Facility name</label><input class="input" id="fac" value="'+esc(S.facility)+'" placeholder="Shown on copied readings"></div>';
   html+='<div class="field"><label for="ini">Your initials</label><input class="input" id="ini" value="'+esc(S.initials)+'"></div>';
   html+='<div class="field"><span class="eyebrow">Pools and spas</span><div class="toggles">'+S.pools.map(function(p,i){return '<button class="tog on" data-rmpool="'+i+'" aria-label="Remove '+esc(p)+'">'+esc(p)+' <span aria-hidden="true">×</span></button>'}).join('')+'</div>'+
@@ -1037,6 +1050,7 @@ function renderSettings(){
   document.getElementById('back').onclick=function(){go('home')};
   app.querySelectorAll('[data-kit]').forEach(function(b){b.onclick=function(){S.kit=b.dataset.kit;save();renderSettings()}});
   app.querySelectorAll('[data-fas]').forEach(function(b){b.onclick=function(){S.fasSample=parseInt(b.dataset.fas,10);save();renderSettings()}});
+  app.querySelectorAll('[data-chs]').forEach(function(b){b.onclick=function(){S.chSample=parseInt(b.dataset.chs,10);save();renderSettings()}});
   document.getElementById('fac').oninput=function(){S.facility=this.value;save()};
   document.getElementById('ini').oninput=function(){S.initials=this.value;save()};
   app.querySelectorAll('[data-rmpool]').forEach(function(b){b.onclick=function(){if(S.pools.length<=1){toast('Keep at least one pool');return}S.pools.splice(+b.dataset.rmpool,1);save();renderSettings()}});

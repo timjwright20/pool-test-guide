@@ -1,5 +1,5 @@
 // Offline cache for the app shell. Bump VERSION whenever index.html changes.
-const VERSION = 'pool-test-v3';
+const VERSION = 'pool-test-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './img/kit.jpg', './img/watergram.jpg'];
 
 self.addEventListener('install', (e) => {

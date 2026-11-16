@@ -7,7 +7,8 @@ A phone web app that walks you through a Taylor professional pool test kit one s
 - **Built for the Taylor K-2006 (FAS-DPD) kit.** Every reagent step shows a map of the open case with the right cap color lit up: yellow for chlorine, red for pH, green for alkalinity, blue for calcium, white for CYA.
 - **Animated steps:** dipping the sample tube to elbow depth, filling to the 10 or 25 mL line, drops that count themselves (5 of 5, 20 of 20), DPD powder dippers, the pH comparator, the CYA mixing bottle and the view tube.
 - **Chlorine by drop count:** tap **+1 drop** for each drop and the app converts the count to ppm (0.2 ppm per drop at 25 mL, 0.5 at 10 mL). The K-2005 (DPD color-match) kit is still in Settings.
-- **Tests:** free, combined and total chlorine; pH; acid/base demand; total alkalinity (R-0007 / R-0008 / R-0009, ×10); calcium hardness (R-0010 / R-0011L / R-0012, ×10); cyanuric acid (R-0013 and the view tube); water temperature.
+- **Tests:** free, combined and total chlorine; pH; acid/base demand; total alkalinity (R-0007 / R-0008 / R-0009, ×10); calcium hardness (10 mL sample: 8 drops R-0010, 2 drops R-0011L, R-0012 ×25; the 25 mL version is in Settings); cyanuric acid (R-0013 and the view tube); water temperature.
+- **Pool or spa, indoor or outdoor:** each test starts by picking both. Indoor tests end after calcium hardness and skip the cyanuric acid test. The app remembers each pool's choice.
 - **Log entry:** laid out like the facility's Chemical Readings screen: free chlorine, combined chlorine, pH, total alkalinity, calcium hardness, cyanuric acid, phosphate and water temperature, in that order, with the same ideal ranges. It also shows total chlorine and the saturation index (same math as the Taylor Watergram).
 - **Pool log:** saved on the phone. You can copy any entry as text or export everything as a CSV.
 - **Works offline** once it's installed, and keeps the screen awake during a test.
